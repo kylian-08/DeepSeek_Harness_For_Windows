@@ -30,7 +30,7 @@ DeepSeek Harness 官方以 CLI / `npx` 方式分发，对普通 Windows 用户�
 | 窗口体验 | 浏览器标签页 | **原生窗口 + 任务栏图标** |
 | 图标 | 默认样式 | **DeepSeek 官方鲸鱼图标，5 套可切换** 🎨 |
 | 安装分发 | 手动配置 | **向导式 setup.exe 安装包**（可选目录 + 快捷方式 + 卸载） |
-| 插件生态 | 手动装配 | **预装 Anchored Standard / Router Standard 插件 + 运行时注入器** |
+| 插件生态 | 手动装配 | **预装 flash增强 / windows增强 插件 + 运行时注入器** |
 | 数据 | `~/.dsh` | **沿用同一份 `~/.dsh`**，无缝迁移 |
 
 ---
@@ -58,9 +58,16 @@ DeepSeek Harness 官方以 CLI / `npx` 方式分发，对普通 Windows 用户�
 
 **在设置 → 窗口图标样式中一键切换，即时生效**，重启保持，源码版与桌面版共用同一份配置。
 
-### 2. 预装高效 Agent 预设
-- **Anchored Standard**：极简模式工具锚定（首请求只暴露 `bash` + `str_replace_editor`，首个工具调用后提升为完整工具集），优化 DeepSeek V4 系列在极简模式下的稳定性
-- **Router Standard**：任务感知的思维模式路由（生成任务自动 react、维护任务自动 spec、模糊任务进 weak 内路由），P1-P23 实测开放任务完成率 0% → 100%
+### 2. 预装高效 Agent 预设（开箱即用，已更名中文化）
+
+两个官方社区预装模式，**模式名 → 插件来源对应关系**：
+
+| UI 模式名 | 插件 / 预设来源 | 核心机制 |
+|---|---|---|
+| **windows增强模式** | [xiaobright/dsh-anchored-standard](https://github.com/xiaobright/dsh-anchored-standard)（anchored-standard 预设） | 极简模式工具锚定：首请求只暴露 `bash` + `str_replace_editor`，首个工具调用后提升为完整工具集，优化 DeepSeek V4 系列在极简模式下的稳定性 |
+| **flash增强模式** | [yjh051108/dsh-routing-suite](https://github.com/yjh051108/dsh-routing-suite)（router-standard 预设） | 任务感知的思维模式路由（生成任务自动 react、维护任务自动 spec、模糊任务进 weak 内路由），P1-P23 实测开放任务完成率 0% → 100% |
+
+> 💡 提示：`dsh-routing-suite` 是「套装」——`flash增强模式` 只是其中的路由预设部分；套装还附带 **dsh-super-injector 注入器**（常驻所有模式，提供 `dev_*` 运行时插件工具），两者绑定安装、独立生效。而 `flash增强模式` 的路由机制本身构建在 `windows增强模式` 的锚定机制之上（作者明确致谢）。
 
 ### 3. 运行时插件注入器（dsh-super-injector）
 BepInEx 式插件注入入口：任意本地 DSH 插件可**免重启注入**运行中的实例，自带热重载、一键自检、卸载即净、插件管理 UI。
@@ -87,7 +94,7 @@ BepInEx 式插件注入入口：任意本地 DSH 插件可**免重启注入**运
 
 首次启动后：
 1. 在 dsh 设置页配置 API Key（默认 `deepseek-v4-flash`）
-2. 新建会话，可在预设菜单选择 **Anchored Standard** 或 **Router Standard**
+2. 新建会话，可在预设菜单选择 **windows增强模式** 或 **flash增强模式**
 3. 在设置 → 窗口图标样式 选择喜欢的图标
 
 ---
@@ -124,8 +131,8 @@ BepInEx 式插件注入入口：任意本地 DSH 插件可**免重启注入**运
 ### 预装插件（用户数据层，`~/.dsh`）
 | 插件 | 来源 | 说明 |
 |---|---|---|
-| `anchored-standard` 预设 | xiaobright/dsh-anchored-standard | 两阶段工具目录锚定 |
-| `router-standard` 预设 + 注入器 | yjh051108/dsh-routing-suite | 思维模式路由 + 运行时注入器 |
+| `anchored-standard` 预设 | xiaobright/dsh-anchored-standard | 两阶段工具目录锚定（UI：windows增强模式） |
+| `router-standard` 预设 + 注入器 | yjh051108/dsh-routing-suite | 思维模式路由 + 运行时注入器（UI：flash增强模式） |
 | `dshharness-shell` | 本项目 | 窗口图标样式设置 |
 
 ---
@@ -147,7 +154,7 @@ BepInEx 式插件注入入口：任意本地 DSH 插件可**免重启注入**运
       │  ~/.dsh 用户数据  │  ← 与官方 CLI 完全共用
       │  sessions/      │
       │  storages/      │  ← dshharness.json（图标样式）
-      │  .agent-presets/│  ← Anchored / Router Standard
+      │  .agent-presets/│  ← windows增强 / flash增强 预设
       │  profiles/web/  │  ← 插件 bundle 栈
       └─────────────────┘
 ```
@@ -208,8 +215,8 @@ SOFTWARE.
 ## 🙏 致谢
 
 - [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) — DeepSeek 官方开源 Agent Harness
-- [xiaobright/dsh-anchored-standard](https://github.com/xiaobright/dsh-anchored-standard) — Anchored Standard 预设
-- [yjh051108/dsh-routing-suite](https://github.com/yjh051108/dsh-routing-suite) — Router Standard 预设与注入器
+- [xiaobright/dsh-anchored-standard](https://github.com/xiaobright/dsh-anchored-standard) — windows增强模式（Anchored Standard 预设）
+- [yjh051108/dsh-routing-suite](https://github.com/yjh051108/dsh-routing-suite) — flash增强模式（Router Standard 预设）与注入器
 - Electron / electron-builder 社区
 
 <div align="center">

@@ -1,0 +1,40 @@
+# electron-builder configuration for DShHarness
+# Build:  powershell -ExecutionPolicy Bypass -File scripts/build.ps1
+appId: com.dshharness.app
+productName: DShHarness
+copyright: Copyright (c) 2026
+
+directories:
+  output: dist
+  buildResources: build-resources
+
+# The asar contains only the Electron shell. The dsh application ships as raw
+# files under resources/runtime (copied by the afterPack hook) so native
+# modules and profile junctions keep real filesystem paths.
+files:
+  - electron/main.js
+  - assets/icon.ico
+  - package.json
+  - "!node_modules/**/*"
+
+afterPack: scripts/after-pack.js
+
+npmRebuild: false
+nodeGypRebuild: false
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/icon.ico
+  artifactName: DShHarness-Setup-${version}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: DShHarness
+  uninstallDisplayName: DShHarness (DeepSeek Harness)

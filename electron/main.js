@@ -1,0 +1,232 @@
+// DShHarness — Electron shell for DeepSeek Harness (dsh)
+//
+// Boots the dsh web server with the bundled node.exe and loads its Web UI.
+// The dsh process runs as a real node.exe child (not Electron's embedded
+// Node) so native modules and node:sqlite behave exactly as in stock Node.
+"use strict";
+
+const { app, BrowserWindow } = require("electron");
+const { spawn, execFile } = require("node:child_process");
+const { existsSync, mkdirSync, appendFileSync } = require("node:fs");
+const { join } = require("node:path");
+const net = require("node:net");
+const http = require("node:http");
+
+const APP_NAME = "DShHarness";
+const DEFAULT_PORT = 3080;
+const READY_TIMEOUT_MS = 90_000;
+
+let mainWindow = null;
+let dshProc = null;
+let dshPort = DEFAULT_PORT;
+let quitting = false;
+
+// --- runtime layout -------------------------------------------------------
+
+// Installed layout: <resources>/runtime/{node.exe, app/}
+// Dev fallback: current node executable + project root.
+function resolveRuntime() {
+  const runtimeDir = join(process.resourcesPath, "runtime");
+  const nodeExe = join(runtimeDir, "node.exe");
+  const appDir = join(runtimeDir, "app");
+  if (existsSync(nodeExe) && existsSync(appDir)) {
+    return { nodeExe, appDir };
+  }
+  return { nodeExe: process.execPath, appDir: join(__dirname, "..") };
+}
+
+function dshBinJs(appDir) {
+  return join(appDir, "node_modules", "@deepseek-ai", "dsh", "lib", "bin.js");
+}
+
+function iconPath() {
+  return join(__dirname, "..", "assets", "icon.ico");
+}
+
+// --- logging --------------------------------------------------------------
+
+function log(msg) {
+  try {
+    const dir = app.getPath("logs");
+    mkdirSync(dir, { recursive: true });
+    appendFileSync(join(dir, "dsh.log"), `[${new Date().toISOString()}] ${msg}\n`);
+  } catch {
+    /* logging must never break the app */
+  }
+}
+
+// --- port helpers ---------------------------------------------------------
+
+function isPortInUse(port) {
+  return new Promise((resolve) => {
+    const sock = net.connect({ port, host: "127.0.0.1" });
+    sock.once("connect", () => { sock.destroy(); resolve(true); });
+    sock.once("error", () => resolve(false));
+    sock.setTimeout(1500, () => { sock.destroy(); resolve(false); });
+  });
+}
+
+function httpOk(port) {
+  return new Promise((resolve) => {
+    const req = http.get({ host: "127.0.0.1", port, path: "/", timeout: 2000 }, (res) => {
+      res.resume();
+      resolve(true);
+    });
+    req.on("timeout", () => { req.destroy(); resolve(false); });
+    req.on("error", () => resolve(false));
+  });
+}
+
+function waitForHttp(port, timeoutMs) {
+  const start = Date.now();
+  return new Promise((resolve) => {
+    const tick = async () => {
+      if (await httpOk(port)) return resolve(true);
+      if (Date.now() - start > timeoutMs) return resolve(false);
+      setTimeout(tick, 500);
+    };
+    tick();
+  });
+}
+
+// --- dsh server -----------------------------------------------------------
+
+function startDsh() {
+  const { nodeExe, appDir } = resolveRuntime();
+  const bin = dshBinJs(appDir);
+
+  return (async () => {
+    const portInUse = await isPortInUse(DEFAULT_PORT);
+    const args = [bin, "web"];
+    if (portInUse) {
+      dshPort = 0; // ask the OS for a free port; we parse it from stdout
+      args.push("--port", "0");
+      log(`port ${DEFAULT_PORT} busy; requesting a random port`);
+    }
+
+    log(`spawning: ${nodeExe} ${args.join(" ")}`);
+    const child = spawn(nodeExe, args, {
+      cwd: app.getPath("home"),
+      env: { ...process.env },
+      windowsHide: false,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    dshProc = child;
+
+    let stdoutBuf = "";
+    child.stdout.on("data", (d) => {
+      const s = d.toString();
+      log("[dsh] " + s.trimEnd());
+      if (dshPort === 0) {
+        stdoutBuf += s;
+        const m = stdoutBuf.match(/127\.0\.0\.1:(\d+)/);
+        if (m) dshPort = Number(m[1]);
+      }
+    });
+    child.stderr.on("data", (d) => log("[dsh:err] " + d.toString().trimEnd()));
+    child.on("exit", (code, sig) => {
+      log(`[dsh] exited code=${code} sig=${sig}`);
+      dshProc = null;
+      if (!quitting) showErrorPage(`DeepSeek Harness 服务意外退出 (code ${code})`);
+    });
+    child.on("error", (err) => {
+      log("[dsh] spawn error: " + err.message);
+      if (!quitting) showErrorPage("无法启动 DeepSeek Harness 服务: " + err.message);
+    });
+
+    if (portInUse) {
+      // Wait for the URL line that carries the actual port.
+      const deadline = Date.now() + 60_000;
+      while (dshPort === 0 && Date.now() < deadline) {
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
+    const ready = await waitForHttp(dshPort, READY_TIMEOUT_MS);
+    return { ready, url: `http://127.0.0.1:${dshPort}` };
+  })();
+}
+
+// --- window ---------------------------------------------------------------
+
+function showErrorPage(message) {
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>
+    body{font-family:Segoe UI,system-ui,sans-serif;background:#0b1020;color:#e8ecf5;
+    display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+    .box{max-width:480px;text-align:center}.title{font-size:18px;font-weight:600;margin-bottom:8px}
+    .msg{font-size:13px;color:#9aa7c7;word-break:break-all}</style></head>
+    <body><div class="box"><div class="title">DShHarness 启动失败</div>
+    <div class="msg">${escapeHtml(message)}</div></div></body></html>`;
+  loadWindow("data:text/html;charset=utf-8," + encodeURIComponent(html));
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 840,
+    title: APP_NAME,
+    autoHideMenuBar: true,
+    backgroundColor: "#0b1020",
+    icon: iconPath(),
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+
+  // 关闭窗口 = 退出应用；before-quit 里会连带清理 dsh 子进程
+  mainWindow.on("closed", () => { mainWindow = null; });
+  mainWindow.webContents.on("did-fail-load", (_e, code, desc) => {
+    showErrorPage(`页面加载失败 (${code} ${desc})`);
+  });
+}
+
+function loadWindow(url) {
+  if (!mainWindow) createWindow();
+  mainWindow.loadURL(url);
+  mainWindow.show();
+}
+
+function showWindow() {
+  if (!mainWindow) createWindow();
+  if (!mainWindow.webContents.getURL()) {
+    loadWindow(`http://127.0.0.1:${dshPort}`);
+  } else {
+    mainWindow.show();
+  }
+}
+
+// --- lifecycle ------------------------------------------------------------
+
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => showWindow());
+
+  app.whenReady().then(async () => {
+    const { ready, url } = await startDsh();
+    log(`dsh ready=${ready} url=${url}`);
+    createWindow();
+    loadWindow(ready ? url : `http://127.0.0.1:${dshPort}`);
+  });
+}
+
+app.on("window-all-closed", () => {
+  app.quit();
+});
+
+app.on("before-quit", () => {
+  quitting = true;
+  if (dshProc) {
+    try {
+      execFile("taskkill", ["/pid", String(dshProc.pid), "/T", "/F"]);
+    } catch {
+      /* best effort */
+    }
+  }
+});

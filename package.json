@@ -1,0 +1,28 @@
+{
+  "name": "deepseek",
+  "version": "1.0.0",
+  "description": "DShHarness - DeepSeek Harness desktop app",
+  "main": "electron/main.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "build": "powershell -ExecutionPolicy Bypass -File scripts/build.ps1"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "@deepseek-ai/dsh": "^0.1.0-rc.6"
+  },
+  "allowScripts": {
+    "@deepseek-ai/dsh-subprocess-local@0.1.0-rc.6": true,
+    "@deepseek-ai/dsh-tool-bash@0.1.0-rc.6": true,
+    "koffi@3.1.5": true,
+    "node-pty@1.1.0": true,
+    "protobufjs@7.6.5": true,
+    "@google/genai@1.52.0": true
+  },
+  "devDependencies": {
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
+    "png-to-ico": "^3.0.2"
+  }
+}

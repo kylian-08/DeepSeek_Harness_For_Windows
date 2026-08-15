@@ -60,6 +60,14 @@ if (-not (Test-Path $NodeSrc)) { throw "node.exe not found at $NodeSrc" }
 Write-Host "[stage] copying node.exe"
 Copy-Item $NodeSrc $NodeExe
 
+# --- copy switchable icon styles (window/tray icon at runtime) ---
+$IconsSrc = Join-Path $ProjectRoot "assets\icons"
+$IconsDst = Join-Path $StageRoot "runtime\icons"
+if (Test-Path $IconsSrc) {
+    Write-Host "[stage] copying icon styles -> runtime\icons"
+    Copy-Item -Recurse $IconsSrc $IconsDst
+}
+
 # --- prune debug / non-windows artifacts ---
 Write-Host "[stage] pruning .pdb debug files"
 Get-ChildItem -Path $NodeModulesDst -Recurse -Filter *.pdb -File -ErrorAction SilentlyContinue |

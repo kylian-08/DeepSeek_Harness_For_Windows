@@ -7,14 +7,27 @@
 
 const { app, BrowserWindow } = require("electron");
 const { spawn, execFile } = require("node:child_process");
-const { existsSync, mkdirSync, appendFileSync } = require("node:fs");
+const { existsSync, mkdirSync, appendFileSync, readFileSync, watchFile } = require("node:fs");
 const { join } = require("node:path");
 const net = require("node:net");
 const http = require("node:http");
+const os = require("node:os");
 
 const APP_NAME = "DShHarness";
 const DEFAULT_PORT = 3080;
 const READY_TIMEOUT_MS = 90_000;
+
+// Icon styles selectable in the dsh settings page (壳外观), matching
+// scripts/gen-icons.js. Stored by the @dshharness/shell plugin in
+// <DSH_HOME>/storages/dshharness.json under { unit, global: { iconStyle } }.
+const ICON_STYLES = [
+  "blue-transparent",
+  "black-transparent",
+  "white-bg-black",
+  "white-bg-blue",
+  "blue-bg-white",
+];
+const DEFAULT_ICON_STYLE = "blue-transparent";
 
 let mainWindow = null;
 let dshProc = null;
@@ -41,6 +54,67 @@ function dshBinJs(appDir) {
 
 function iconPath() {
   return join(__dirname, "..", "assets", "icon.ico");
+}
+
+// --- runtime icon switching (壳外观 setting) -------------------------------
+
+// Installed layout: <resources>/runtime/icons/<style>/{icon.ico,...}
+// Dev layout: <project>/assets/icons/<style>/
+function resolveIconsDir() {
+  const installed = join(process.resourcesPath, "runtime", "icons");
+  if (existsSync(installed)) return installed;
+  return join(__dirname, "..", "assets", "icons");
+}
+
+function dshHomeDir() {
+  return process.env.DSH_HOME && process.env.DSH_HOME.trim()
+    ? process.env.DSH_HOME.trim()
+    : join(os.homedir(), ".dsh");
+}
+
+// The @dshharness/shell plugin persists { unit, global: { iconStyle } } here.
+function iconSettingFile() {
+  return join(dshHomeDir(), "storages", "dshharness.json");
+}
+
+function readIconStyle() {
+  try {
+    const raw = readFileSync(iconSettingFile(), "utf8");
+    const doc = JSON.parse(raw);
+    // The @dshharness/shell plugin stores the style string directly in the
+    // domain's global slot: { unit, global: "<style>", tables: {} }.
+    const style = doc && typeof doc.global === "string" ? doc.global : undefined;
+    return ICON_STYLES.includes(style) ? style : DEFAULT_ICON_STYLE;
+  } catch {
+    return DEFAULT_ICON_STYLE;
+  }
+}
+
+function applyIconStyle(style) {
+  if (!ICON_STYLES.includes(style)) style = DEFAULT_ICON_STYLE;
+  const ico = join(resolveIconsDir(), style, "icon.ico");
+  if (!existsSync(ico)) {
+    log(`icon style "${style}" missing file ${ico}; keeping current`);
+    return;
+  }
+  if (mainWindow) {
+    mainWindow.setIcon(ico);
+    log(`applied icon style: ${style}`);
+  } else {
+    log(`icon style queued: ${style}`);
+  }
+}
+
+// Poll the persisted setting (watchFile uses stat polling, so it also
+// catches the storage backend's atomic rename writes) and swap the window
+// icon at runtime. Startup applies the persisted choice, then watches.
+function watchIconSetting() {
+  applyIconStyle(readIconStyle());
+  const file = iconSettingFile();
+  watchFile(file, { interval: 1000 }, () => {
+    applyIconStyle(readIconStyle());
+  });
+  log(`watching icon setting: ${file}`);
 }
 
 // --- logging --------------------------------------------------------------
@@ -213,6 +287,7 @@ if (!gotLock) {
     log(`dsh ready=${ready} url=${url}`);
     createWindow();
     loadWindow(ready ? url : `http://127.0.0.1:${dshPort}`);
+    watchIconSetting();
   });
 }
 

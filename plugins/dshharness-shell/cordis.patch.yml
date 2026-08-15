@@ -1,0 +1,6 @@
+# DShHarness shell bundle layer: registers the server half of the
+# shell-appearance settings plugin.
+- insert:
+    - id: dshharness-shell
+      name: '@dshharness/shell'
+      config: {}

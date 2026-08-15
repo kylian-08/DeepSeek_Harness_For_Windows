@@ -1,0 +1,33 @@
+{
+  "name": "@dshharness/shell",
+  "version": "0.1.0",
+  "description": "DShHarness shell appearance settings: icon style picker for the packaged desktop app",
+  "private": true,
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "zod": "^3.25.76"
+  },
+  "license": "MIT"
+}

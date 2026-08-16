@@ -271,12 +271,9 @@ SOFTWARE.
 | 项目 Project | 一句话介绍 One-line Intro |
 |---|---|
 | 🐋 [DeepSeek_Harness_For_Windows](https://github.com/kylian-08/DeepSeek_Harness_For_Windows) | 基于 DeepSeek Harness 官方开源 Agent Harness 的 **Windows 桌面封装版**——无需命令行、无需 Node.js 环境、无需科学上网，下载安装包双击即用。 |
-| ⚙️ [deepseek-harness](https://github.com/kylian-08/deepseek-harness) | DeepSeek AI 开发的**开源 Agent Harness（dsh）**，采用"一切都是插件"的架构，由 Cordis 驱动。 |
 | 🏢 [AgentsOffice](https://github.com/kylian-08/AgentsOffice) | **本地优先的多 Agent 协作中枢**——把散落在 Cursor、Codex、Claude Code 里的 Agent 组织成一支会协作、会交接、会沉淀知识的本地研发团队。 |
 | 🎨 [Prompt Assistant](https://github.com/kylian-08/AI_fronted_backend_knowledge_base) | **前端风格与组件 AI 提示词助手平台**，可浏览、搜索、复制 91 种 UI 风格与 45 个组件、11 个后端框架的高质量 Prompt 模板。 |
 | ✅ [Todo_Assistant](https://github.com/kylian-08/Todo_Assistant) | **本地优先的 Bug / 待办 / 需求 / 灵感归档工作台**，极简毛玻璃界面，支持 Markdown、看板拖拽、定时提醒、WebDAV 同步与 Electron 桌面增强。 |
-| 🎬 [TypeTale · 字字动画](https://github.com/kylian-08/TypeTale) | **完全免费**的 AIGC 视频创作软件，面向小说推文、AI 短剧、AI 电影，覆盖文案、分镜、图片、音频、视频生成到剪映导出的全链路。 |
-| 🥟 [roubao · 肉包](https://github.com/kylian-08/roubao) | **首款无需电脑的开源 AI 手机自动化助手**，基于视觉语言模型（VLM）的原生 Android 多 Agent 协作方案。 |
 
 **如果你觉得 DSH4Win 有价值，欢迎 ⭐ Star 支持，让更多 Windows 用户发现 DeepSeek Harness！**
 

@@ -19,6 +19,25 @@
 
 ---
 
+## 🌱 项目缘起 · Origin Story
+
+前段时间 DeepSeek Harness 正式版发布，我在自己的 Windows 电脑上第一时间试用，却大失所望——完全没有感受到正式版相对预览版有什么提升。
+
+后来我在 Debian 上尝试了极简模式，体感竟轻松超过了 Claude Opus 4.8 的水平，让我大为不解。仔细研究、又在开源社区里翻找信息后我才明白：原来官方并没有针对 Windows 做专门优化，导致首轮工具锚定失败，后续表现也因此大打折扣。
+
+于是我从社区大佬的插件入手，做了一定的修改，成功把 Debian 环境下的智能水准稳定复现到了 Windows 上。
+
+我一直想把 AI 安利给身边各行各业的朋友，问了一圈大家的意见，回答出奇一致：亲手部署 dsh 的门槛太高了。于是，这个项目应运而生——
+
+**专为 Windows 用户与小白用户打造的开箱即用版 DeepSeek**：
+
+- **双模式强化**：新增 `flash增强模式` 与 `windows增强模式`，专门强化其在 Windows 上的表现。`flash增强模式` 能大幅提升 deepseek-v4-flash 的能力，`windows增强模式` 则同时增益 flash 与 pro 模型。
+- **图标自由切换**：内置 5 套官方鲸鱼图标，随时换肤——一个没什么用、但赏心悦目的小功能 😄
+- **运行时注入**：插件免重启热注入，Windows 桌面版与 Web UI 保持完全一致的体验。
+- **双启动形态**：Windows 桌面版与 WebUI 均可启动，与官方 Harness 自由切换、数据互通。
+
+---
+
 ## ✨ 为什么选择 DSH4Win · Why DSH4Win
 
 DeepSeek Harness 官方以 CLI / `npx` 方式分发，对普通 Windows 用户并不友好。DSH4Win 将其**深度封装为原生 Windows 桌面应用**。
@@ -242,6 +261,24 @@ SOFTWARE.
 - [xiaobright/dsh-anchored-standard](https://github.com/xiaobright/dsh-anchored-standard) — windows增强模式（Anchored Standard 预设）
 - [yjh051108/dsh-routing-suite](https://github.com/yjh051108/dsh-routing-suite) — flash增强模式（Router Standard 预设）与注入器
 - Electron / electron-builder 社区
+
+---
+
+## ⭐ 求关注 · Follow & Star
+
+如果 DSH4Win 帮到了你，欢迎给作者的开源项目点个 ⭐ Star，持续关注：
+
+| 项目 Project | 一句话介绍 One-line Intro |
+|---|---|
+| 🐋 [DeepSeek_Harness_For_Windows](https://github.com/kylian-08/DeepSeek_Harness_For_Windows) | 基于 DeepSeek Harness 官方开源 Agent Harness 的 **Windows 桌面封装版**——无需命令行、无需 Node.js 环境、无需科学上网，下载安装包双击即用。 |
+| ⚙️ [deepseek-harness](https://github.com/kylian-08/deepseek-harness) | DeepSeek AI 开发的**开源 Agent Harness（dsh）**，采用"一切都是插件"的架构，由 Cordis 驱动。 |
+| 🏢 [AgentsOffice](https://github.com/kylian-08/AgentsOffice) | **本地优先的多 Agent 协作中枢**——把散落在 Cursor、Codex、Claude Code 里的 Agent 组织成一支会协作、会交接、会沉淀知识的本地研发团队。 |
+| 🎨 [Prompt Assistant](https://github.com/kylian-08/AI_fronted_backend_knowledge_base) | **前端风格与组件 AI 提示词助手平台**，可浏览、搜索、复制 91 种 UI 风格与 45 个组件、11 个后端框架的高质量 Prompt 模板。 |
+| ✅ [Todo_Assistant](https://github.com/kylian-08/Todo_Assistant) | **本地优先的 Bug / 待办 / 需求 / 灵感归档工作台**，极简毛玻璃界面，支持 Markdown、看板拖拽、定时提醒、WebDAV 同步与 Electron 桌面增强。 |
+| 🎬 [TypeTale · 字字动画](https://github.com/kylian-08/TypeTale) | **完全免费**的 AIGC 视频创作软件，面向小说推文、AI 短剧、AI 电影，覆盖文案、分镜、图片、音频、视频生成到剪映导出的全链路。 |
+| 🥟 [roubao · 肉包](https://github.com/kylian-08/roubao) | **首款无需电脑的开源 AI 手机自动化助手**，基于视觉语言模型（VLM）的原生 Android 多 Agent 协作方案。 |
+
+**如果你觉得 DSH4Win 有价值，欢迎 ⭐ Star 支持，让更多 Windows 用户发现 DeepSeek Harness！**
 
 <div align="center">
 

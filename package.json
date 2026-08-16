@@ -1,7 +1,7 @@
 {
   "name": "deepseek",
   "version": "1.0.0",
-  "description": "DShHarness - DeepSeek Harness desktop app",
+  "description": "DSH4Win - DeepSeek Harness desktop app for Windows",
   "main": "electron/main.js",
   "author": "",
   "license": "MIT",

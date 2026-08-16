@@ -1,7 +1,7 @@
-# electron-builder configuration for DShHarness
+# electron-builder configuration for DSH4Win
 # Build:  powershell -ExecutionPolicy Bypass -File scripts/build.ps1
 appId: com.dshharness.app
-productName: DShHarness
+productName: DSH4Win
 copyright: Copyright (c) 2026
 
 directories:
@@ -28,7 +28,7 @@ win:
       arch:
         - x64
   icon: assets/icon.ico
-  artifactName: DShHarness-Setup-${version}.${ext}
+  artifactName: DSH4Win-Setup-${version}.${ext}
 
 nsis:
   oneClick: false
@@ -36,5 +36,5 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: DShHarness
-  uninstallDisplayName: DShHarness (DeepSeek Harness)
+  shortcutName: DSH4Win
+  uninstallDisplayName: DSH4Win (DeepSeek Harness for Windows)

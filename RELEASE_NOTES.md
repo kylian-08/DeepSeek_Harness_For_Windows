@@ -1,4 +1,4 @@
-# DShHarness v1.0.0 发行日志
+# DSH4Win v1.0.0 发行日志
 
 > DeepSeek Harness 桌面封装版 —— 双击即用，无需命令行
 
@@ -32,17 +32,17 @@
 
 ## 安装方式
 
-1. 下载 `DShHarness-Setup-1.0.0.exe`
+1. 下载 `DSH4Win-Setup-1.0.0.exe`
 2. 双击运行，按向导安装（可选安装目录）
 3. 从桌面快捷方式或开始菜单启动
 
-> 便携版：解压 `win-unpacked.zip` 后直接运行 `DShHarness.exe` 亦可。
+> 便携版：解压 `win-unpacked.zip` 后直接运行 `DSH4Win.exe` 亦可。
 
 ## 文件校验
 
 | 文件 | 大小 | SHA-256 |
 |---|---|---|
-| DShHarness-Setup-1.0.0.exe | 159.9 MB | `7f588e0cc7d71bc8622b46e13bfdb96269bb69a0b8036704dacc878db9edb83f` |
+| DSH4Win-Setup-1.0.0.exe | 159.9 MB | `7f588e0cc7d71bc8622b46e13bfdb96269bb69a0b8036704dacc878db9edb83f` |
 
 ## 已知限制
 

@@ -1,4 +1,4 @@
-# DShHarness build: stage the app, generate the icon, then package with
+# DSH4Win build: stage the app, generate the icon, then package with
 # electron-builder (portable win-unpacked + NSIS setup.exe).
 #
 # Usage:  powershell -ExecutionPolicy Bypass -File scripts\build.ps1

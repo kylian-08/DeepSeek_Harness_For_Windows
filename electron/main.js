@@ -1,4 +1,4 @@
-// DShHarness — Electron shell for DeepSeek Harness (dsh)
+// DSH4Win — Electron shell for DeepSeek Harness (dsh) for Windows
 //
 // Boots the dsh web server with the bundled node.exe and loads its Web UI.
 // The dsh process runs as a real node.exe child (not Electron's embedded
@@ -13,7 +13,7 @@ const net = require("node:net");
 const http = require("node:http");
 const os = require("node:os");
 
-const APP_NAME = "DShHarness";
+const APP_NAME = "DSH4Win";
 const DEFAULT_PORT = 3080;
 const READY_TIMEOUT_MS = 90_000;
 
@@ -228,7 +228,7 @@ function showErrorPage(message) {
     display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
     .box{max-width:480px;text-align:center}.title{font-size:18px;font-weight:600;margin-bottom:8px}
     .msg{font-size:13px;color:#9aa7c7;word-break:break-all}</style></head>
-    <body><div class="box"><div class="title">DShHarness 启动失败</div>
+    <body><div class="box"><div class="title">DSH4Win 启动失败</div>
     <div class="msg">${escapeHtml(message)}</div></div></body></html>`;
   loadWindow("data:text/html;charset=utf-8," + encodeURIComponent(html));
 }

@@ -60,6 +60,21 @@ if (-not (Test-Path $NodeSrc)) { throw "node.exe not found at $NodeSrc" }
 Write-Host "[stage] copying node.exe"
 Copy-Item $NodeSrc $NodeExe
 
+# --- copy first-launch preset installer + bundled agent presets ---
+# The desktop shell runs ensure-presets.js with the bundled node.exe on
+# startup; it copies these presets into <DSH_HOME>/.agent-presets/ (idempotent).
+$EnsureScript = Join-Path $ProjectRoot "scripts\ensure-presets.js"
+if (Test-Path $EnsureScript) {
+    Copy-Item $EnsureScript (Join-Path $StageRoot "runtime\ensure-presets.js")
+    Write-Host "[stage] copied ensure-presets.js -> runtime"
+}
+$PresetsSrc = Join-Path $ProjectRoot "assets\presets"
+$PresetsDst = Join-Path $StageRoot "runtime\presets"
+if (Test-Path $PresetsSrc) {
+    Copy-Item -Recurse $PresetsSrc $PresetsDst
+    Write-Host "[stage] copied presets -> runtime\presets"
+}
+
 # --- copy switchable icon styles (window/tray icon at runtime) ---
 $IconsSrc = Join-Path $ProjectRoot "assets\icons"
 $IconsDst = Join-Path $StageRoot "runtime\icons"

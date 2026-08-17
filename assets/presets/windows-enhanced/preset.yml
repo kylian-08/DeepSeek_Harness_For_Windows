@@ -1,0 +1,3 @@
+name: windows增强模式
+description: 极简工具锚定开局 + 首工具后全量提升（Anchored Standard 预设，来自 xiaobright/dsh-anchored-standard）。首轮只暴露核心工具（persistent bash + str_replace_editor），首个工具调用后恢复完整 Standard 工具目录。
+order: 5

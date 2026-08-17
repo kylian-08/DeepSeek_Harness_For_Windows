@@ -52,6 +52,51 @@ function dshBinJs(appDir) {
   return join(appDir, "node_modules", "@deepseek-ai", "dsh", "lib", "bin.js");
 }
 
+// --- first-launch agent presets (预装 windows增强 / flash增强) -------------
+//
+// Runs scripts/ensure-presets.js with the bundled node.exe BEFORE the dsh
+// server starts, so the preset menu already offers our two presets on the
+// very first launch. Idempotent: an installed preset is left untouched and
+// the home default-preset patch is written at most once. Non-fatal — if the
+// script fails for any reason the app still boots with stock presets.
+function ensureBundledPresets() {
+  const { nodeExe, appDir } = resolveRuntime();
+  const installedRuntime = join(process.resourcesPath, "runtime");
+  const installed = existsSync(join(installedRuntime, "ensure-presets.js"));
+  const script = installed
+    ? join(installedRuntime, "ensure-presets.js")
+    : join(appDir, "scripts", "ensure-presets.js");
+  const presetSource = installed
+    ? join(installedRuntime, "presets")
+    : join(appDir, "assets", "presets");
+
+  if (!existsSync(script)) {
+    log(`ensure-presets: script not found at ${script}; skipping`);
+    return Promise.resolve();
+  }
+
+  log(`ensure-presets: running ${script} (source ${presetSource})`);
+  return new Promise((resolve) => {
+    const child = spawn(nodeExe, [script], {
+      env: { ...process.env, DSH_PRESET_SOURCE: presetSource },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let out = "";
+    child.stdout.on("data", (d) => (out += d));
+    child.stderr.on("data", (d) => (out += d));
+    child.on("exit", (code) => {
+      if (out.trim()) log("[ensure-presets] " + out.trimEnd().replace(/\n/g, " | "));
+      if (code !== 0) log(`ensure-presets exited code=${code}`);
+      resolve();
+    });
+    child.on("error", (err) => {
+      log("ensure-presets spawn error: " + err.message);
+      resolve();
+    });
+  });
+}
+
+
 function iconPath() {
   return join(__dirname, "..", "assets", "icon.ico");
 }
@@ -283,6 +328,7 @@ if (!gotLock) {
   app.on("second-instance", () => showWindow());
 
   app.whenReady().then(async () => {
+    await ensureBundledPresets();
     const { ready, url } = await startDsh();
     log(`dsh ready=${ready} url=${url}`);
     createWindow();

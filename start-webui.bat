@@ -34,6 +34,13 @@ echo  启动完成后请在浏览器打开：http://127.0.0.1:3080
 echo  按 Ctrl+C 可停止服务。
 echo ============================================
 echo.
+
+rem 首次启动预装 Agent 预设（windows增强 / flash增强），幂等，可随时安全重复执行
+where node >nul 2>nul
+if not errorlevel 1 (
+    node "%~dp0scripts\ensure-presets.js"
+)
+
 npx dsh web
 
 echo.

@@ -75,6 +75,22 @@ if (Test-Path $PresetsSrc) {
     Write-Host "[stage] copied presets -> runtime\presets"
 }
 
+# --- copy AI sidecar tools installer + plugin bundle (first-launch) ---
+# ensure-ai-tools.js registers @dshharness/ai-tools into the web profile and
+# migrates locally-configured API keys into private storage on first launch.
+$EnsureAiTools = Join-Path $ProjectRoot "scripts\ensure-ai-tools.js"
+if (Test-Path $EnsureAiTools) {
+    Copy-Item $EnsureAiTools (Join-Path $StageRoot "runtime\ensure-ai-tools.js")
+    Write-Host "[stage] copied ensure-ai-tools.js -> runtime"
+}
+$PluginSrc = Join-Path $ProjectRoot "plugins\dshharness-ai-tools"
+$PluginDst = Join-Path $StageRoot "runtime\plugins\dshharness-ai-tools"
+if (Test-Path $PluginSrc) {
+    New-Item -ItemType Directory -Force -Path (Split-Path $PluginDst) | Out-Null
+    Copy-Item -Recurse $PluginSrc $PluginDst
+    Write-Host "[stage] copied ai-tools plugin -> runtime\plugins\dshharness-ai-tools"
+}
+
 # --- copy switchable icon styles (window/tray icon at runtime) ---
 $IconsSrc = Join-Path $ProjectRoot "assets\icons"
 $IconsDst = Join-Path $StageRoot "runtime\icons"

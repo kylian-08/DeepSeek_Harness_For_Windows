@@ -19,6 +19,9 @@ Thumbs.db
 .env.local
 *.env.local
 
+# Generated assets (AI tools output)
+output/
+
 # Editor / tooling
 .vscode/
 .idea/

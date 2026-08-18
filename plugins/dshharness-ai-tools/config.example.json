@@ -1,0 +1,9 @@
+{
+  "relay": {
+    "base_url": "https://www.zizidonghua.com/v1",
+    "api_key": "PASTE_YOUR_RELAY_API_KEY_HERE"
+  },
+  "zhipu": {
+    "api_key": "PASTE_YOUR_ZHIPU_API_KEY_HERE"
+  }
+}

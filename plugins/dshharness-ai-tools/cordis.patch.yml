@@ -1,0 +1,6 @@
+# dshharness-ai-tools bundle layer: registers the AI sidecar tools plugin.
+# Installed by scripts/ensure-ai-tools.js into the web profile on first launch.
+- insert:
+    - id: dshharness-ai-tools
+      name: '@dshharness/ai-tools'
+      config: {}

@@ -96,6 +96,50 @@ function ensureBundledPresets() {
   });
 }
 
+// --- first-launch AI sidecar tools (外挂能力插件) --------------------------
+//
+// Runs scripts/ensure-ai-tools.js with the bundled node.exe BEFORE the dsh
+// server starts, registering the @dshharness/ai-tools plugin into the web
+// profile (copy + bundles) and migrating locally-configured API keys into
+// the private <DSH_HOME>/storages/ai-tools.json. Idempotent and non-fatal:
+// the app still boots with stock tools if it fails.
+function ensureAiTools() {
+  const { nodeExe, appDir } = resolveRuntime();
+  const installedRuntime = join(process.resourcesPath, "runtime");
+  const installed = existsSync(join(installedRuntime, "ensure-ai-tools.js"));
+  const script = installed
+    ? join(installedRuntime, "ensure-ai-tools.js")
+    : join(appDir, "scripts", "ensure-ai-tools.js");
+  const pluginSource = installed
+    ? join(installedRuntime, "plugins", "dshharness-ai-tools")
+    : join(appDir, "plugins", "dshharness-ai-tools");
+
+  if (!existsSync(script)) {
+    log(`ensure-ai-tools: script not found at ${script}; skipping`);
+    return Promise.resolve();
+  }
+
+  log(`ensure-ai-tools: running ${script} (source ${pluginSource})`);
+  return new Promise((resolve) => {
+    const child = spawn(nodeExe, [script], {
+      env: { ...process.env, DSH_AI_TOOLS_SOURCE: pluginSource },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let out = "";
+    child.stdout.on("data", (d) => (out += d));
+    child.stderr.on("data", (d) => (out += d));
+    child.on("exit", (code) => {
+      if (out.trim()) log("[ensure-ai-tools] " + out.trimEnd().replace(/\n/g, " | "));
+      if (code !== 0) log(`ensure-ai-tools exited code=${code}`);
+      resolve();
+    });
+    child.on("error", (err) => {
+      log("ensure-ai-tools spawn error: " + err.message);
+      resolve();
+    });
+  });
+}
+
 
 function iconPath() {
   return join(__dirname, "..", "assets", "icon.ico");
@@ -329,6 +373,7 @@ if (!gotLock) {
 
   app.whenReady().then(async () => {
     await ensureBundledPresets();
+    await ensureAiTools();
     const { ready, url } = await startDsh();
     log(`dsh ready=${ready} url=${url}`);
     createWindow();

@@ -39,6 +39,7 @@ rem 首次启动预装 Agent 预设（windows增强 / flash增强），幂等，可随时安全重复执行
 where node >nul 2>nul
 if not errorlevel 1 (
     node "%~dp0scripts\ensure-presets.js"
+    node "%~dp0scripts\ensure-ai-tools.js"
 )
 
 npx dsh web

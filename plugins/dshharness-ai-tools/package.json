@@ -1,0 +1,27 @@
+{
+  "name": "@dshharness/ai-tools",
+  "version": "0.1.0",
+  "description": "DSH4Win 外挂能力:中转站 OCR/生图/TTS/视频 + 智谱识图/生图/视频 + AutoGLM 生图/搜图 + ffmpeg 视频处理,注册为 dsh 可调用工具;API key 私有存储,自动探测中转站模型并分类",
+  "private": true,
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": { "default": "./lib/index.js" },
+    "./client": { "default": "./lib/client.js" },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "inject": ["@deepseek-ai/dsh-client-runtime", "@deepseek-ai/dsh-client-ui-slots"],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": ">=0.0.1-rc <2",
+    "@deepseek-ai/dsh-llm": ">=0.0.1-rc <2",
+    "@deepseek-ai/schemastery": "^3.18.0",
+    "cordis": ">=4.0.0-rc <5"
+  },
+  "license": "MIT"
+}
